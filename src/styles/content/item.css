@@ -1,0 +1,15 @@
+.content-item-wrapper{
+    height: 7rem;
+    width: 15rem;
+    border: 1px solid black;
+    margin-left: 3px;
+    margin-right: 3px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    background-color: aliceblue;
+}
+
+.content-item{
+}

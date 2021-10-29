@@ -1,0 +1,22 @@
+.resource-wrapper{
+    display: flex;
+    flex-direction: column;
+}
+
+.resource-header{
+    padding-left: 1rem;
+}
+
+.resource-intro{
+    padding-left: 2rem;
+}
+
+.section-list{
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    justify-content: flex-start;
+    padding-right: 2rem;
+    padding-left: 2rem;
+    justify-content: center;
+}
