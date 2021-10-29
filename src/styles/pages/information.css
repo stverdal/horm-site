@@ -2,12 +2,14 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: flex-start;
+    height: 100%;
+    padding: 10vh;
 }
 
 .information-block{
-    width: 70%;
+    width: 50%;
 }
 
-.information.title{
-    
+.information-title{
 }

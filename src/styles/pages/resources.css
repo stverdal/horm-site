@@ -1,6 +1,9 @@
 .resource-wrapper{
+    height: 100%;
     display: flex;
     flex-direction: column;
+    padding-left: 10vw;
+    padding-right: 10vw;
 }
 
 .resource-header{
@@ -15,8 +18,7 @@
     display: flex;
     flex-direction: column;
     height: 100%;
-    justify-content: flex-start;
     padding-right: 2rem;
     padding-left: 2rem;
-    justify-content: center;
+    justify-content: space-evenly;
 }

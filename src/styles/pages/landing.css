@@ -1,14 +1,13 @@
 .landing-wrapper{
     display: flex;
     flex-direction: column;
+    justify-content: space-evenly;
+    height: 100%;
 }
 
 .landing-intro-wrapper{
-    padding-top: 2rem;
-    padding-left: 5rem;
-    padding-right: 5rem;
-    padding-bottom: 1rem;
-    flex-grow: 1;
+    padding-left: 15vw;
+    padding-right: 15vw;
 }
 
 .landing-intro-logo{
@@ -21,15 +20,16 @@
 }
 
 .landing-guide{
-    margin-top: 3rem;
-    flex-grow: 1;
+
 }
 
 .landing-guide-items{
     padding: 0rem;
+    padding-left: 7vw;
+    padding-right: 7vw;
     display: flex;
     flex-direction: row;
-    justify-content: space-around;
+    justify-content: space-evenly;
 }
 
 .guide-item{
