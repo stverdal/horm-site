@@ -1,7 +1,4 @@
 .footer-wrapper{
-    background-color: #254153;
-    position: absolute;
-    bottom: 0;
     width: 100%;
     display: flex;
     flex-direction: row;
@@ -9,6 +6,6 @@
 }
 
 .footer-content{
-    color: white;
+    color: grey;
     align-self: center;
 }

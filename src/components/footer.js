@@ -4,8 +4,8 @@ import "../styles/layout/footer.css"
 
 const Footer = () => {
     return (
-        <div className="footer-wrapper">
-            <div className="footer-content">Lorem ipsum dolor sit amet</div>
+        <div className="footer-wrapper bg-light">
+            <div className="footer-content"><i>Human Organizational Risk Models</i></div>
         </div>
     )
 }

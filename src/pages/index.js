@@ -1,18 +1,20 @@
 import * as React from "react"
 import PageLayout from "../components/layout"
-
-import LandingIntro from "../components/landing/landing"
-import LandingGuide from "../components/landing/guide"
+import LandingWrapper from "../components/landing/landing-wrapper"
 
 const LandingPage = () => {
     return (
       <PageLayout>
-        <div className="landing-wrapper">
-          <LandingIntro />
-          <LandingGuide />
-        </div>
+        <LandingWrapper />
       </PageLayout>        
     )
 }
 
 export default LandingPage
+
+/*
+        <div className="landing-wrapper">
+          <LandingIntro />
+          <LandingGuide />
+        </div>
+*/

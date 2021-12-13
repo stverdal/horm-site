@@ -1,3 +1,11 @@
+.editor-page-container{
+    height: 100%;
+}
+
+.editor-row{
+    height: 100%;
+}
+
 .editor-wrapper{
     display: flex;
     align-items: center;
@@ -8,6 +16,19 @@
 
 .editor{
     height: 95%;
-    width: 95%;
+    width: 98%;
     border: 1px solid black;
+}
+
+.sidebar-wrapper{
+    margin-top: 0.8rem;
+}
+
+.sidebar{
+    margin-top: 0.5rem;
+    padding-left: 0;
+    height: 95%;
+    border: 1px solid black;
+    font-size: small;
+    padding-top: 1rem;
 }

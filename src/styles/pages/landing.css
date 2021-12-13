@@ -6,20 +6,62 @@
 }
 
 .landing-intro-wrapper{
-    padding-left: 15vw;
-    padding-right: 15vw;
+    padding-left: 25vw;
+    padding-right: 25vw;
+    margin-bottom: 5rem;
+    margin-top: 3rem;
+}
+
+.landing-title{
+    text-align: center;
+    margin: 2rem;
+    margin-top: 4rem;
+}
+
+.landing-text{
+    margin: 1rem;
+    padding: 2rem;
+    padding-left: 3rem;
+    padding-right: 3rem;
 }
 
 .landing-intro-logo{
     text-align: center;
-    margin-bottom: 3rem;
 }
 
 .landing-intro-introduction{
     text-align: center;
 }
 
+.landing-intro-buttons{
+    padding-right: 3rem;
+    padding-left: 3rem;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+}
+
 .landing-guide{
+    background-color: ghostwhite;
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+
+}
+
+.landing-guide-column{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 75%;
+}
+
+.landing-guide-section{
+    background-color: white;
+    border: 1px solid grey;
+    border-radius: 5px;
+    margin: 1rem;
+    padding: 1rem;
+    width: 70%;
 
 }
 
@@ -32,12 +74,38 @@
     justify-content: space-evenly;
 }
 
+
 .guide-item{
     width: 12rem;
     height: 11rem;
     border: 1px solid black;
     border-radius: 3px;
     background-color: aliceblue;
+}
+
+.guide-col{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+@media only screen and (max-width: 700px) {
+    .landing-guide-items{
+        padding: 0rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-evenly;
+        align-items: center;
+    }
+
+    .guide-item{
+        width: 12rem;
+        height: 11rem;
+        border: 1px solid black;
+        border-radius: 3px;
+        background-color: aliceblue;
+        margin: 1rem;
+    }
 }
 
 .guide-item-header{

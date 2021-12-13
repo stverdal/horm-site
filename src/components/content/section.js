@@ -9,7 +9,7 @@ const ContentSection = () => {
     return (
         <div className="section-wrapper">
             <div className="section-header">
-                <h2>Resource section</h2>
+                <h2 className="fw-light">Resource section</h2>
             </div>
             <ul className="section-content">
                 <ContentItem />

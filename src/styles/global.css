@@ -6,6 +6,14 @@ html, body {
     height: 100%;
 }
 
+#___gatsby {
+    height: 100%;
+}
+
+#gatsby-focus-wrapper {
+    height: 100%;
+}
+
 a {
     color: inherit;
     text-decoration: none;

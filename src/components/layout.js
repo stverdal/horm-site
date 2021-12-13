@@ -4,6 +4,7 @@ import Footer from "./footer"
 
 import "../styles/global.css"
 import "../styles/layout/layout.css"
+import "bootstrap/dist/css/bootstrap.min.css"
 
 const PageLayout = ({ children }) => {
     return (

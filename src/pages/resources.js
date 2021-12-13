@@ -10,10 +10,10 @@ const ResourcePage = () => {
       <PageLayout>
             <div className="resource-wrapper">
                 <div className="resource-header">
-                    <h1>Resources</h1>
+                    <h1 className="fw-light">Resources</h1>
                 </div>
                 <div className="resource-intro">
-                    <p>Below you can find some resources that can help you get started with CJML.</p>
+                    <p className="lead text-muted">Below you can find some resources that can help you get started with CJML.</p>
                 </div>
                 <ul className="section-list">
                     <ContentSection />

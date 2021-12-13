@@ -1,18 +1,25 @@
 .header-wrapper{
-    background-color: #254153;
+    background-color: white;
     width: 100%;
+    padding-left: 3rem;
+    padding-right: 3rem;
 }
 
 .header-links{
-    color: white;
+    color:black;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
+    border-bottom: 1px solid black;
+}
+
+.header-links a{
+    text-decoration: none;
 }
 
 .header-links-list{
-    color: white;
+    color:black;
     display: flex;
     justify-content: flex-end;
     align-items: center;
@@ -24,7 +31,6 @@
 }
 
 .header-links-list-item{
-    color: white;
     position: relative;
     padding: .4rem;
     margin: 0.5rem;
