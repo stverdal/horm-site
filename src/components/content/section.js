@@ -5,17 +5,18 @@ import ContentItem from "./item.js"
 import "../../styles/global.css"
 import "../../styles/content/section.css"
 
-const ContentSection = () => {
+import courseinfo from './courseinfo'
+
+const ContentSection = ({title, keyword}) => {
     return (
         <div className="section-wrapper">
             <div className="section-header">
-                <h2 className="fw-light">Resource section</h2>
+                <h2 className="fw-light">{title}</h2>
             </div>
             <ul className="section-content">
-                <ContentItem />
-                <ContentItem />
-                <ContentItem />
-                <ContentItem />
+                {Object.keys(courseinfo[keyword]).map(key => 
+                    <ContentItem title={courseinfo[keyword][key]["title"]} contentName={courseinfo[keyword][key]["content_name"]} image={courseinfo[keyword][key]["image"]}/>
+                )}
             </ul>
         </div>
     )

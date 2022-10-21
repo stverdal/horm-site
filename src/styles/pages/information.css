@@ -10,5 +10,13 @@
     width: 50%;
 }
 
+.centered{
+    text-align: center;
+}
+
 .information-title{
+}
+
+ul{
+    list-style: none;
 }

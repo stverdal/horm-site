@@ -1,11 +1,32 @@
 .footer-wrapper{
     width: 100%;
+    display: grid;
+    grid-template-columns: 2fr 6fr 1fr 1fr;
+    grid-template-rows: auto;
+    grid-template-areas: "wip-tag content . icon";
+    padding: 5px;
+}
+
+.wip-tag{
+    color: grey;
+    grid-area: wip-tag;
     display: flex;
-    flex-direction: row;
+    align-items: center;
     justify-content: center;
+    text-align: center;
 }
 
 .footer-content{
     color: grey;
-    align-self: center;
+    grid-area: content;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.footer-logo{
+    grid-area: icon;
+    display: flex;
+    justify-content: center;
 }

@@ -3,16 +3,13 @@ import * as React from "react"
 import "../../styles/global.css"
 import "../../styles/pages/landing.css"
 
+import LandingImage from "../../images/horm_example_perspective.png"
+
 import { Container, Row, Col } from "react-bootstrap"
 
 const LandingIntro = () => {
     return (
         <Container>
-            <Row className="landing-title">
-                <Col className="fw-light">
-                    <h1 className="fw-light"><b>The human element in cybersecurity</b></h1>
-                </Col>
-            </Row>
             <Row>
                 <Col className="fw-light landing-text">
                     <h5 className="fw-light"><i>What is this?</i></h5>
@@ -21,8 +18,6 @@ const LandingIntro = () => {
                         <li>To help companies identify and understand risks caused by the human element, we introduce the Human and Organisational Risk Modelling (HORM) framework.</li>
                         <li>Through simple visualisations, the HORM framework provides you with methods and tools to raise awareness about cyber security in your company.</li>
                     </ul>
-                </Col>
-                <Col className="fw-light landing-text">
                     <h5 className="fw-light"><i>What's in it for you?</i></h5>
                     <ul>
                         <li>Understand how our daily activities may result in unwanted incidents</li>
@@ -30,6 +25,15 @@ const LandingIntro = () => {
                         <li>Help communicate this across a broad user group</li>
                         <li>Learn more about how to analyse, forecast and manage cyber security and data protection risks.</li>
                     </ul>
+                </Col>
+                <Col className="fw-light landing-text">
+                    <div className="landing-image">
+                        <img
+                            src={LandingImage}
+                            width="700"
+                            alt="HORM"
+                        />
+                    </div>
                 </Col>
             </Row>
         </Container>
@@ -49,4 +53,13 @@ export default LandingIntro
             </div>
         </div>
     )
+
+    
+
+
+            <Row className="landing-title">
+                <Col className="fw-light">
+                    <h1 className="fw-light"><b>The human element in cybersecurity</b></h1>
+                </Col>
+            </Row>
 */

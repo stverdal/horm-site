@@ -4,9 +4,9 @@ import LandingWrapper from "../components/landing/landing-wrapper"
 
 const LandingPage = () => {
     return (
-      <PageLayout>
-        <LandingWrapper />
-      </PageLayout>        
+        <PageLayout>
+          <LandingWrapper />
+        </PageLayout>   
     )
 }
 
