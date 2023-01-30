@@ -17,7 +17,8 @@ const initialState = {
         subsection: "",
     },
     newDecorator: null,
-    visible: false
+    visible: false,
+    cellResizing: false,
 }
 
 export const graphSlice = createSlice({
@@ -101,7 +102,8 @@ export const graphSlice = createSlice({
         },
         removeElement: (state, action) => {
             console.log("remove element")
-        }
+        },
+        
     }
 });
 export const { prepareElement, addElement, decorateElement, removeElement} = graphSlice.actions;

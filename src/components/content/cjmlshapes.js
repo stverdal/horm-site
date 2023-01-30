@@ -46,7 +46,7 @@ function cjmlShapes(joint) {
                 refHeight: "100%",
                 fill: "#F2F2F2",
                 stroke: "#D9D9D9",
-                magnet: false,
+                magnet: "passive",
                 rx: 5,
                 ry: 5,
                 strokeWidth: 2,
@@ -70,6 +70,18 @@ function cjmlShapes(joint) {
                 textVerticalAnchor: "middle",
                 textAnchor: "middle"
             },
+            sizeSelector: {
+                event: 'element:sizeSelector:pointerdown',
+                visibility: 'hidden',
+                opacity: 0.3,
+                refX: "100%",
+                //refX: "100% right",
+                //refY: "0%",
+                //refHeight: "100%",
+                //refWidth: "50px",
+                d: "M -20 0 H 0 V 150 H -20 V 0",
+                fill: "#000000"
+            },
         }
     }, {
         markup: [
@@ -89,6 +101,10 @@ function cjmlShapes(joint) {
                 tagName: "text",
                 selector: "text"
             },
+            {
+                tagName: "path",
+                selector: "sizeSelector",
+            }
         ]
     });
     joint.dia.Element.define("cjml.commElement", {
@@ -106,10 +122,10 @@ function cjmlShapes(joint) {
                 strokeWidth: 3,
             },
             innerBody: {
-                refX: "15%",
-                refY: "15%",
-                refWidth: "70%",
-                refHeight: "70%",
+                refX: "10%",
+                refY: "10%",
+                refWidth: "80%",
+                refHeight: "80%",
                 fill: "#FFF"
             },
             icon: {
@@ -163,7 +179,7 @@ function cjmlShapes(joint) {
                 refHeight: "100%",
                 fill: "#FFF",
                 stroke: "#000000",
-                magnet: true,
+                magnet: "passive",
                 rx: 5,
                 ry: 5,
                 strokeWidth: 1,

@@ -71,7 +71,7 @@ export const editorSlice = createSlice({
             var { section, id } = action.payload;
             var item = iconInfo[section][id];
             var svg = item["svg"];
-            if (section == "communication" || section === "action") {
+            if (section == "communication" || section === "action" || section === "actors") {
                 state.selectedElement.attr("icon/href", svg.icon);
             } else if (section == "supplemental") {
                 state.selectedElement.attr("decorator/href", svg.icon)

@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from "react-redux"
-import Offcanvas from 'react-bootstrap/Offcanvas';
 import { Accordion, InputGroup, Button, FormControl } from "react-bootstrap"
 
 //import { Graph } from "jointjs/src/dia"

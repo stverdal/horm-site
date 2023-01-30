@@ -106,8 +106,9 @@ const ElementEditor = () => {
                         </Button>
                     </InputGroup>
                 </Row>
-                <p>Change icon</p>
+                {(editor_slice.selectedElement.attributes.type !== "cjml.actionElement") ?
                 <Row className="element-editor-section">
+                    <p>Change icon</p>
                     <Accordion>
                         <Accordion.Item eventKey="0">
                             <Accordion.Header>Select Icon</Accordion.Header>
@@ -116,7 +117,7 @@ const ElementEditor = () => {
                             </Accordion.Body>
                         </Accordion.Item>
                     </Accordion>
-                </Row>
+                </Row> : null}
                 {(editor_slice.selectedElement.attributes.type !== "cjml.swimlaneElement") ?
                 <Row className="element-editor-section">
                     <p>Add cybersecurity tag</p>

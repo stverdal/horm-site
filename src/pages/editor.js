@@ -3,18 +3,18 @@ import { Container, Row, Col } from "react-bootstrap"
 import * as joint from "jointjs"
 import { useSelector, useDispatch } from "react-redux"
 import { Provider } from "react-redux"
-import { addElement, removeElement, decorateElement} from "../features/graph/graphSlice"
-import { toggleOffCanvas} from "../features/cjml/cjmlSlice"
+import { addElement, removeElement, decorateElement, setCellResizing } from "../features/graph/graphSlice"
+//import { toggleOffCanvas} from "../features/cjml/cjmlSlice"
 import editorSlice, { elementSelected, toggleEditor, startMovePaper, endMovePaper } from "../features/editor/editorSlice"
 import _ from 'lodash';
 import Button from 'react-bootstrap/Button';
 
 import PageLayout from "../components/layout"
 import Sidebar from "../components/sidebar"
-import FileLoader from "../components/fileloader"
+//import FileLoader from "../components/fileloader"
 import iconInfo from "../components/content/iconinfo"
 import ElementEditor from "../components/elementeditor"
-import OffCanvas from "../components/offCanvas"
+//import OffCanvas from "../components/offCanvas"
 import SaveBar from "../components/content/saveBar"
 
 
@@ -23,7 +23,7 @@ import SaveBar from "../components/content/saveBar"
 import "../styles/global.css"
 import "../styles/pages/editor.css"
 import cjmlShapes from "../components/content/cjmlshapes"
-import { StaticQueryDocument } from "gatsby"
+import { parsePath, StaticQueryDocument } from "gatsby"
 
 
 const EditorPage = () => {
@@ -34,8 +34,10 @@ const EditorPage = () => {
   const [flag, setFlag] = useState(false);
   const [paper, setPaper] = useState(null);
 
+  //const [increaseElementSize, setIncreaseElementSize] = useState(false);
   var paperMoveX = 0;
   var paperMoveY = 0;
+  var increaseElementSize = false
 
   const dispatch = useDispatch();
   const graph_slice = useSelector((state) => state.graph);
@@ -46,11 +48,6 @@ const EditorPage = () => {
   };
 
 
-
-  useEffect(() => {
-    //console.log("SDF{FDSASJDLKDJLSAKDLASKDFEJSALKDJLWKJDLASKJDLSKJDLSAKDJEJDIEJOQIJEJSLDKJ")
-    //onsole.log(paper)
-  }, [paper])
   useEffect(() => {
     if (window !== undefined) {
       window.joint = joint;
@@ -73,76 +70,26 @@ const EditorPage = () => {
         width: document.getElementById("editor-wrapper").offsetWidth - 10,
         height: document.getElementById("editor-wrapper").offsetHeight - 10,
         gridSize: 1,
-        background: {
-          color: 'rgba(255, 255, 255, 1)',
-        },
         interactive: true,
         cellViewNamespace: joint.shapes,
-        defaultLink: new joint.shapes.standard.Link()
+        defaultLink: new joint.shapes.standard.Link(),
       });
 
-      /*;
-      newPaper.on('cell:contextmenu', contextClick);
-      newPaper.on('blank:contextmenu', handleBlankContext)
-      newPaper.on('cell:pointerup', embedElement);
-      newPaper.on('cell:pointerdown', unembedElement);
-      newPaper.on('blank:pointerdown', beginMovePaper);
-      newPaper.on('blank:pointermove', movePaper);
-      newPaper.on('blank:pointerup', endMovePaper);
-      newPaper.on('cell:mousewheel', handleScroll);
-      newPaper.on('blank:mousewheel', handleScrollBlank);
-      */
-
-
+      newPaper.setGrid({
+        name: 'doubleMesh',
+        args: [
+          { color: 'red' },
+          { color: 'green', thickness: 10, scaleFactor: 8 }
+        ]
+      }).drawGrid();
       setPaper(newPaper);
-      //paper = newPaper;
+
     }
-      /*
-      setPaper(new joint.dia.Paper({
-        el: document.getElementById("editor"),
-        model: currGraph, // change
-        width: document.getElementById("editor-wrapper").offsetWidth - 10,
-        height: document.getElementById("editor-wrapper").offsetHeight - 10,
-        gridSize: 1,
-        background: {
-          color: 'rgba(255, 255, 255, 1)',
-        },
-        interactive: true,
-        cellViewNamespace: joint.shapes,
-      }))
-    }
-    */
-    //Add listeners to window
-    //window.addEventListener('resize', this.updatePaperSize);
-    //window.addEventListener("mousedown", this.toggleInfo);
-    //window.addEventListener("pointermove", this.moveItem);
-    //Add listeners to paper
-    //paper.on('cell:contextmenu', (elementView, e, x, y) => this.props.elementDoubleClicked(elementView.model, e));
-    //paper.on('cell:pointerdblclick', (elementView, e, x, y) => this.props.elementDoubleClicked(elementView.model, e));
-    //paper.on('element:pointerdblclick', (elementView, e, x, y) => this.props.elementDoubleClicked(elementView.model, e));
-    //paper.on('element:pointermove', this.resizeElement);
-    //paper.on('element:mouseenter', this.onHover);
-    //paper.on('element:mouseleave', this.exitHover);
-
-    //paper.on('link:mouseenter', function(linkView) {
-    //    //console.log(`Showtools `,linkView.showTools())
-    //    linkView.showTools();
-    //});
-
-    //paper.on('link:mouseleave', function(linkView) {
-    //    linkView.hideTools();
-    //});
-
-    //paper.on('cell:mousewheel', this.handleScroll);
-    //paper.on('blank:mousewheel', this.handleScrollBlank);
-
-    //paper.on('blank:pointerdown', this.beginMovePaper);
-    //paper.on('blank:pointermove', this.movePaper);
 
 
 
 
-    
+
     if (paper !== null) {
       initGraph(paper.model);
       //paper.on('blank:pointerup', blankPointerUp);
@@ -156,44 +103,29 @@ const EditorPage = () => {
       //paper.on('blank:pointerup', endMovePaper);
       paper.on('cell:mousewheel', handleScroll);
       paper.on('blank:mousewheel', handleScrollBlank);
+      paper.on('element:mouseenter', onHover);
+      paper.on('element:mouseleave', exitHover);
+      paper.on('element:pointermove', resizeElement);
+      paper.on('element:sizeSelector:pointerdown', beginElementResize);
 
-      paper.on('link:mouseenter', function(linkView) {
+
+      paper.on('link:mouseenter', function (linkView) {
         //console.log(`Showtools `,linkView.showTools())
-        console.log("SHOWINF TOOLS");
         linkView.showTools();
       });
 
-      paper.on('link:mouseleave', function(linkView) {
+      paper.on('link:mouseleave', function (linkView) {
         linkView.hideTools();
       });
+
+      //paper.setGrid({ name: 'mesh', args: { color: 'hsla(212, 7%, 75%, 0.5)' } });
+      //paper.drawGrid()
+      //paper.setGrid('mesh')
+      //paper.drawGrid()
+
     };
 
-
-    //paper.on('element:sizeSelector:pointerdown', this.beginElementResize);
-
-    //setCurrGraph(displayed_graph)
-    //console.log("graph", displayed_graph)
-
-  },[paper, flag]);
-
-  /*
-  useEffect(() => {
-    console.log("currgraph", currGraph)
-    var swimlane = new joint.shapes.standard.Rectangle();
-    swimlane.position(25, 25);
-    swimlane.resize(800, 90);
-    //swimlane.addTo(currGraph);
-    swimlane.attr({
-      body: {
-        fill: '#F2F2F2',
-        rx: 5,
-        ry: 5,
-        strokeWidth: 2,
-        stroke: '#D9D9D9'
-      }
-    })
-  }, [])*/
-
+  }, [paper, flag]);
 
   const saveGraphToFile = (fileName) => {
     const a = document.createElement('a');
@@ -216,23 +148,23 @@ const EditorPage = () => {
     console.log("Attaching tools");
     //Create tools for link
     var linkView = link.findView(paper);
-   // console.log(`AttachTools Linkview `, linkView);
+    // console.log(`AttachTools Linkview `, linkView);
 
     //combine tools in a view
     var boundaryTool = new joint.linkTools.Boundary();
     var removeButton = new joint.linkTools.Remove();
 
     var customToolsView = new joint.dia.ToolsView({
-        tools: [
-            boundaryTool,
-            removeButton
-        ]
+      tools: [
+        boundaryTool,
+        removeButton
+      ]
     });
 
     //add toolview to the linkview that is attached to link
     linkView.addTools(customToolsView);
     linkView.hideTools();
-}
+  }
 
   const handleBlankContext = (e) => {
     e.preventDefault();
@@ -245,28 +177,30 @@ const EditorPage = () => {
   const contextClick = (elementView, e, x, y) => {
     //console.log("Contextx",elementView.model);
     //console.log(editor_slice);
-    dispatch(elementSelected({ targetElement: elementView.model, event: e, x: x, y: y}));
+    dispatch(elementSelected({ targetElement: elementView.model, event: e, x: x, y: y }));
   }
-  
+
   const handleScroll = (cellView, e, x, y, delta) => {
     e.preventDefault();
     const scaleFactor = 1.03;
     const currentScale = paper.scale();
 
     if (delta > 0) {
-        const newX = currentScale.sx * scaleFactor > 5 ? currentScale.sx : currentScale.sx * scaleFactor;
-        const newY = currentScale.sy * scaleFactor > 5 ? currentScale.sy : currentScale.sy * scaleFactor;
-        paper.scale(newX, newY);
+      const newX = currentScale.sx * scaleFactor > 5 ? currentScale.sx : currentScale.sx * scaleFactor;
+      const newY = currentScale.sy * scaleFactor > 5 ? currentScale.sy : currentScale.sy * scaleFactor;
+      paper.scale(newX, newY);
     } else if (delta < 0) {
-        const newX = currentScale.sx / scaleFactor < 0.52 ? currentScale.sx : currentScale.sx / scaleFactor;
-        const newY = currentScale.sy / scaleFactor < 0.52 ? currentScale.sy : currentScale.sy / scaleFactor;
-        paper.scale(newX, newY);
+      const newX = currentScale.sx / scaleFactor < 0.52 ? currentScale.sx : currentScale.sx / scaleFactor;
+      const newY = currentScale.sy / scaleFactor < 0.52 ? currentScale.sy : currentScale.sy / scaleFactor;
+      paper.scale(newX, newY);
     }
   }
 
   const handleScrollBlank = (e, x, y, delta) => {
     handleScroll(null, e, x, y, delta);
   }
+
+  //
 
   const saveToLocalStorage = () => {
     console.log("saving")
@@ -292,7 +226,7 @@ const EditorPage = () => {
     //dispatch(startMovePaper({x: x, y: y}));
     paperMoveX = x;
     paperMoveY = y;
-  } 
+  }
   const movePaper = (e, x, y) => {
     //console.log(moving, px, py)
     /*
@@ -309,47 +243,82 @@ const EditorPage = () => {
     //console.log("SLICE ", editor_slice.paperMoving)
     //console.log("Paper", paper);
     var { tx, ty } = paper.translate();
-  
+
 
     paper.translate(tx + (x - paperMoveX), ty + (y - paperMoveY));
 
+
+
+
     //paper.translate(tx + (x - editor_slice.pointerCoordinates.x), ty + (y - editor_slice.pointerCoordinates.x));
   }
-/*
-  const endMovePaper = (e, x, y) => {
-    if (editor_slice.paperMoving) {
-        dispatch(endMovePaper())
+  /*
+    const endMovePaper = (e, x, y) => {
+      if (editor_slice.paperMoving) {
+          dispatch(endMovePaper())
+      }
+    }
+  
+    */
+
+  const onHover = (cellView, evt) => {
+    if (cellView.model.attributes.type === "cjml.swimlaneElement") {
+      var cell = cellView.model;
+      cellView.highlight();
+      cell.attr({
+        sizeSelector: {
+          visibility: "visible"
+        }
+      })
+    } else {
+      cellView.showTools()
+    }
+
+  }
+
+  const exitHover = (cellView, evt) => {
+    if (cellView.model.attributes.type === "cjml.swimlaneElement") {
+      var cell = cellView.model;
+      cellView.unhighlight();
+      cell.attr({
+        sizeSelector: {
+          visibility: "hidden"
+        }
+      })
     }
   }
 
-  */
+  const beginElementResize = (cellView, e, x, y) => {
+    cellView.options.interactive = false;
+    increaseElementSize = true
+    //dispatch(setCellResizing(true));
+  }
 
+  const resizeElement = (cellView, e, x, y) => {
+    //console.log(graph_slice.cellResizing)
+    console.log(increaseElementSize)
+    if (increaseElementSize) {
+      var pos = cellView.model.attributes.position;
+      var size = cellView.model.attributes.size;
+      let newWidth = x - pos.x;
 
-  /*
-    beginMovePaper(e, x, y) {
-        console.log('HELLO');
-        this.setState({ paperMove: { moving: true, x, y } });
+      cellView.model.set({
+        size: { width: newWidth, height: size.height }
+      });
+      //cellView.model.attr({
+      //    cornerBox: {d: 'M 0 120 H 120 120 V 120 0'}
+      //})
+
+      // To make the highlight follow the actual border
+      cellView.unhighlight();
+      cellView.highlight();
     }
-    
-    movePaper(e, x, y) {
-        if (this.state.paperMove.moving) {
-            const { tx, ty } = this.paper.translate();
-            this.paper.translate(tx + (x - this.state.paperMove.x), ty + (y - this.state.paperMove.y));
-        }
-    }
-
-    endMovePaper(e, x, y) {
-        if (this.state.paperMove.moving) {
-            this.setState({ paperMove: { moving: false } })
-        }
-    }
-
-  */
+  }
 
   const embedElement = (cellView, evt, x, y) => {
     //console.log("checking embeddddd")
     var cell = cellView.model;
-    console.log("CELL ",cell)
+    console.log("CELL ", cell)
     if (cell.attributes.type === 'standard.Link') {
       console.log("CELL source", cell.getSourceElement())
       //removes selftargeting
@@ -363,7 +332,6 @@ const EditorPage = () => {
         target = cell.getTargetElement();
       }
 
-      //Remove magnet from action and swimlane. Create new element for action.
       switch (target.attributes.type) {
         case "cjml.commElement":
           if (source.getParentCell() === target.getParentCell()) {
@@ -371,27 +339,99 @@ const EditorPage = () => {
           } else {
             //Valid link
             attachTools(cell);
+            //change color of initiator
+            source.attr({
+              body: {
+                fill: "#DBEEF4"
+              },
+              innerBody: {
+                fill: "#DBEEF4"
+              },
+            });
           }
           break;
         default:
           cell.remove();
       }
+    } else {
+      var pos = cellView.model.attributes.position;
+      var swimlaneAxis = 120; //use different grid size for swimlanes and touchpoints
+      var swimlineHeight = 150;
+      var touchpointHeight = 120;
+
+      var yOffset = 15;
+      var xOffset = 120;
+
+      var touchpointAxis = (swimlineHeight - touchpointHeight) / 2;
+      //console.log("touchpointaxis",touchpointAxis)
+      //console.log("round swim",Math.round(pos.x / swimlaneAxis) * swimlaneAxis)
+      //console.log("round touch",Math.round(pos.x / touchpointAxis) * touchpointAxis)
+
+      //check if swimlane
+      if (cell.attributes.type === "cjml.swimlaneElement") {
+        cell.position(Math.round(pos.x / swimlaneAxis) * swimlaneAxis, Math.round(pos.y / swimlaneAxis) * swimlaneAxis);
+        //var embedded = cell.getEmbeddedCells();
+        //console.log("embeds", embedded);
+        //TODO improve hack
+        /*
+        for (let i = 0; i < embedded.length; i++) {
+          var child = embedded[i];
+          var cellViewsBelow = paper.findViewsFromPoint(child.getBBox().center());;
+
+          if (cellViewsBelow.length && _.find(cellViewsBelow, function (c) { return c.model.id !== cell.id })) {
+            var cellViewBelow = _.find(cellViewsBelow, function (c) { return c.model.id !== cell.id });
+            var swimlanePos = cellViewBelow.model.get('position');
+            var touchpointPos = { x: Math.round(pos.x / swimlaneAxis) * swimlaneAxis, y: swimlanePos.y + yOffset }
+            if (touchpointPos.x < swimlanePos.x + xOffset) {
+              touchpointPos.x = touchpointPos.x + swimlaneAxis;
+            }
+
+            //reserve space to the left for actor icon
+
+            child.position(touchpointPos.x, touchpointPos.y);
+            console.log("pos", touchpointPos)
+          }
+        }
+        */
+      } //else check if touchpoint
+      else if (cell.attributes.type === "cjml.commElement" || cell.attributes.type === "cjml.actionElement") {
+        //cell.position(Math.round(pos.x / swimlaneAxis) * swimlaneAxis, Math.round(pos.y / (touchpointAxis + 100)) * (touchpointAxis + 100));
+        var cellViewsBelow = paper.findViewsFromPoint(cell.getBBox().center());;
+
+        if (cellViewsBelow.length && _.find(cellViewsBelow, function (c) { return c.model.id !== cell.id })) {
+          var cellViewBelow = _.find(cellViewsBelow, function (c) { return c.model.id !== cell.id });
+          var swimlanePos = cellViewBelow.model.get('position');
+          var touchpointPos = { x: Math.round(pos.x / swimlaneAxis) * swimlaneAxis, y: swimlanePos.y + yOffset }
+          if (touchpointPos.x < swimlanePos.x + xOffset) {
+            touchpointPos.x = touchpointPos.x + swimlaneAxis;
+          }
+
+          //reserve space to the left for actor icon
+
+          cell.position(touchpointPos.x, touchpointPos.y);
+          console.log("pos", touchpointPos)
+        }
+      }
     }
 
+    //End resize
+    if (increaseElementSize) {
+      cellView.options.interactive = true;
+      increaseElementSize = false;
+      cellView.unhighlight();
+      return;
+    }
 
-    console.log("slice", graph_slice)
     if (graph_slice.preparedElement.element != null && graph_slice.newElement.section == "supplemental") {
-      console.log("SUPPLEMENTAL")
       var cellViewsBelow = paper.findViewsFromPoint(cell.getBBox().center());
 
       console.log(cellViewsBelow);
 
       if (cellViewsBelow.length) {
-          var cellViewBelow = _.find(cellViewsBelow, function (c) { return c.model.id !== cell.id });
-          if (cellViewBelow && cellViewBelow.model.get('parent') !== cell.id) {
-            console.log("TRARGETRAREF", cellViewBelow.model)
-            //dispatch(decorateElement({ targetElement: cellViewBelow.model}));
-          }
+        var cellViewBelow = _.find(cellViewsBelow, function (c) { return c.model.id !== cell.id });
+        if (cellViewBelow && cellViewBelow.model.get('parent') !== cell.id) {
+          //dispatch(decorateElement({ targetElement: cellViewBelow.model}));
+        }
       }
     } else {
 
@@ -400,35 +440,38 @@ const EditorPage = () => {
       console.log(cellViewsBelow);
 
       if (cellViewsBelow.length) {
-          var cellViewBelow = _.find(cellViewsBelow, function (c) { return c.model.id !== cell.id });
-          if (cellViewBelow && cellViewBelow.model.get('parent') !== cell.id) {
-              cellViewBelow.model.embed(cell);
-          }
+        var cellViewBelow = _.find(cellViewsBelow, function (c) { return c.model.id !== cell.id });
+        if (cellViewBelow && cellViewBelow.model.get('parent') !== cell.id) {
+          cellViewBelow.model.embed(cell);
+        }
       }
     }
   }
 
+
+
   const unembedElement = (cellView) => {
     var cell = cellView.model;
+    //paper.setGridSize(1)
     //if link return, no need to prepare for embedding
     //if (cell.attributes.type === 'coras.defaultLink') {
     //    return;
     //}
-    
+
     //console.log('unembedElement')
 
     //if link exit
     //this.setState({ elementPosition: cell.attributes.position });
 
     if (!cell.get('embeds') || cell.get('embeds').length === 0) {
-        cell.toFront();
+      cell.toFront();
     }
 
     if (cell.get('parent')) {
-        console.log(paper.model)
-        paper.model.getCell(cell.get('parent')).unembed(cell);
+      console.log(paper.model)
+      paper.model.getCell(cell.get('parent')).unembed(cell);
     }
-}
+  }
 
   //Creates new elements by dropping on paper.
   const handlePaperMouseUp = (e) => {
@@ -439,17 +482,17 @@ const EditorPage = () => {
     //Check if new element or decorating existing element
     //if (graph_slice.newElement.section == "supplemental") {
     //  var target = e.target;
-      //var parent = target.parentElement;
+    //var parent = target.parentElement;
     //  console.log("Target", target)
     //  while (target.getAttribute("data-type") == null) {
     //    target = target.parentElement;
     //    console.log("Target", target)
     //  }
     //  if (target.getAttribute("data-type") === "cjml.commElement") {
-     //   console.log("IN HERE",target.getAttribute("data-type"));
+    //   console.log("IN HERE",target.getAttribute("data-type"));
     //    console.log("target",target)
-     //   target.attr("body/fill", "#fe988d");
-        //dispatch(decorateElement({ targetElement: target }));
+    //   target.attr("body/fill", "#fe988d");
+    //dispatch(decorateElement({ targetElement: target }));
     //  }
     const localPoint = paper.pageToLocalPoint(e.pageX, e.pageY);
 
@@ -461,7 +504,7 @@ const EditorPage = () => {
         var validTarget = decotarget[decotarget.length - 1]
         let targetType = validTarget.get("type");
         if (targetType === "cjml.commElement" || targetType === "cjml.actionElement") {
-          dispatch(decorateElement({ targetElement: validTarget}));
+          dispatch(decorateElement({ targetElement: validTarget }));
         }
       }
     } else {
@@ -479,7 +522,7 @@ const EditorPage = () => {
     //console.log("CHECKING STATE", graph_slice.preparedElement.element)
     //var cellView = paper.findViewByModel(graph_slice.preparedElement.element);
     //embedElement(cellView);
-    
+
     //saveToLocalStorage();
 
     //this.props.elementDropped(this.paper.model, localPoint.x, localPoint.y);
@@ -489,11 +532,11 @@ const EditorPage = () => {
   };
 
   const initGraph = (graph) => {
-    console.log("INITGRPAH")
+    console.log("INITGRAPH")
     graph.attributes.cells.models.map((model) => {
-        if (model.attributes.type === 'standard.Link') {
-            attachTools(model);
-        }
+      if (model.attributes.type === 'standard.Link') {
+        attachTools(model);
+      }
     })
   }
 
@@ -515,8 +558,13 @@ const EditorPage = () => {
   }
 
   const handleOffCanvasShow = () => {
-    dispatch(toggleOffCanvas())
+    //dispatch(toggleOffCanvas())
   }
+
+  //<Sidebar graph={currGraph} />
+  //{false ? <FileLoader loadGraph={loadNewGraph} attachTools={attachTools}/>: null}
+  //<SaveBar saveFile={saveGraphToFile} loadFile={loadNewGraph}/>
+  //<OffCanvas />
 
   return (
     <PageLayout>
@@ -524,9 +572,7 @@ const EditorPage = () => {
         <Row className="editor-row">
           <Col lg={2}>
             <Sidebar graph={currGraph} />
-            {false ? <FileLoader loadGraph={loadNewGraph} attachTools={attachTools}/>: null}
-            <SaveBar saveFile={saveGraphToFile} loadFile={loadNewGraph}/>
-            <OffCanvas />
+            <SaveBar saveFile={saveGraphToFile} loadFile={loadNewGraph} />
           </Col>
           <Col
             className="editor-wrapper"
@@ -545,107 +591,3 @@ const EditorPage = () => {
 }
 
 export default EditorPage
-
-
-/*
-
-    var swimlane = new joint.shapes.standard.Rectangle();
-    swimlane.position(25, 25);
-    swimlane.resize(800, 90);
-    swimlane.addTo(displayed_graph);
-    swimlane.attr({
-      body: {
-        fill: '#F2F2F2',
-        rx: 5,
-        ry: 5,
-        strokeWidth: 2,
-        stroke: '#D9D9D9'
-      }
-    })
-
-    var swimlane2 = swimlane.clone()
-    swimlane2.position(25, 125)
-    swimlane2.addTo(displayed_graph)
-
-    var touchpoint = new joint.shapes.standard.Rectangle();
-    touchpoint.position(100, 30)
-    touchpoint.resize(150, 80);
-    touchpoint.attr({
-      body: {
-        fill: '#DBEEF4',
-        rx: 5,
-        ry: 5,
-        strokeWidth: 2,
-        stroke: '#31859C'
-      },
-      label: {
-        text: 'Meets for an \nappointment \nwith GP'
-      }
-    })
-    touchpoint.addTo(displayed_graph)
-    swimlane.embed(touchpoint)
-
-    var touchpoint2 = touchpoint.clone();
-    touchpoint2.position(100, 130)
-    touchpoint2.attr({
-      body: {
-        fill: '#FFFFFF',
-        rx: 5,
-        ry: 5,
-        strokeWidth: 2,
-        stroke: '#31859C'
-      },
-      label: {
-        text: 'Medical \nexamination =>\nneed to consult\na specialist ',
-      }
-    })
-
-    touchpoint2.addTo(displayed_graph)
-
-    var touchpoint3 = touchpoint.clone();
-    touchpoint3.position(260, 130);
-    touchpoint3.attr({
-      label: {
-        text: 'Sending an\nelectronic\nreferral to the\nspecialist',
-      }
-    })
-    touchpoint3.addTo(displayed_graph)
-
-    swimlane2.embed(touchpoint2)
-    swimlane2.embed(touchpoint3)
-    var circle = new joint.shapes.standard.Circle();
-    circle.position(300, 300);
-    circle.resize(50, 50)
-    circle.attr({
-      body: {
-        fill: '#FFFFFF',
-        rx: 5,
-        ry: 5,
-        strokeWidth: 3,
-        stroke: '#31859C'
-      }
-    })
-
-    circle.addTo(displayed_graph)
-
-    var circle2 = circle.clone();
-    circle2.position(400, 400);
-    circle2.attr({
-      body: {
-        stroke: '#B7DEE8'
-      }
-    })
-    circle2.addTo(displayed_graph)
-    var link = new joint.shapes.standard.Link();
-    link.source(touchpoint);
-    link.target(touchpoint2);
-    link.attr('line/stroke', '#7F7F7F');
-    link.addTo(displayed_graph);
-
-    var link2 = new joint.shapes.standard.Link();
-    link2.source(circle);
-    link2.target(circle2);
-    link2.attr('line/stroke', '#7F7F7F');
-    link2.addTo(displayed_graph);
-
-*/

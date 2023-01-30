@@ -112,13 +112,10 @@ import Comm_Invoice1 from "../../svg/symbols/communication/invoice-1.svg"
 import Comm_Letter1 from "../../svg/symbols/communication/letter-1.svg"
 import Comm_Telephone1 from "../../svg/symbols/communication/telephone-1.svg"
 import Comm_Payment1 from "../../svg/symbols/communication/payment-1.svg"
+import Comm_UnknownChannel from "../../svg/symbols/communication/unknown-channel.svg"
 
 //CUSTOMER EXPERIENCE
-import CustomerExperience_Neutral from "../../svg/symbols/customer_experience/neutral.svg"
-import CustomerExperience_Unsatisfied from "../../svg/symbols/customer_experience/unsatisfied.svg"
-import CustomerExperience_Satisfied from "../../svg/symbols/customer_experience/satisfied.svg"
-import CustomerExperience_VerySatisfied from "../../svg/symbols/customer_experience/very-satisfied.svg"
-import CustomerExperience_VeryUnsatisfied from "../../svg/symbols/customer_experience/very-unsatisfied.svg"
+
 
 //CYBERSECURITY
 import Cybersecurity_Attacker from "../../svg/symbols/cybersecurity/attacker.svg"
@@ -130,6 +127,8 @@ import Cybersecurity_Attacker from "../../svg/symbols/cybersecurity/attacker.svg
 
 import {
     user1,
+    user2,
+    user8,
     employee1,
     bank3,
     staff_tech1,
@@ -137,7 +136,8 @@ import {
     tech1_database,
     tech5_cloud,
     service_provider_1,
-    staff_IT1
+    staff_IT1,
+    user3
 } from "../../svg/symbols/actors/CJMLSymbolsBase64.js"
 
 import { chat,
@@ -147,7 +147,8 @@ import { chat,
     invoice_1,
     letter_1,
     payment_1,
-    telephone_1
+    telephone_1,
+    unknown_channel
 } from "../../svg/symbols/communication/CJMLSymbolsBase64.js"
 
 import {
@@ -169,18 +170,19 @@ import {
 
 export default {
     action: {
-        chat: {
-            icon: <Comm_Chat/>,
-            id: "chat",
-            description: "A chat",
+        action: {
+            icon: <Comm_UnknownChannel/>,
+            id: "action",
+            description: "An action",
             svg: {
-                icon: chat,
+                icon: unknown_channel,
                 height: 120,
                 width: 180,
                 iconHeight: 50,
                 shapeFn: () => new joint.shapes.cjml.actionElement(),
                 attrs: {
                     fill: "#FFF",
+                    icon: user1,
 
                 }
             }
@@ -203,6 +205,38 @@ export default {
                 shapeFn: () => new joint.shapes.cjml.swimlaneElement(),
                 attrs: {
                     icon: user1,
+                }
+            }
+        },
+        user_2: {
+            icon: <Actors_User2/>,
+            id: "user_2",
+            description: "A user",
+            subsection: "user",
+            svg: {
+                icon: user2,
+                height: 150,
+                width: 1400,
+                iconHeight: 50,
+                shapeFn: () => new joint.shapes.cjml.swimlaneElement(),
+                attrs: {
+                    icon: user2,
+                }
+            }
+        },
+        user_8: {
+            icon: <Actors_User8/>,
+            id: "user_8",
+            description: "A user",
+            subsection: "user",
+            svg: {
+                icon: user8,
+                height: 150,
+                width: 1400,
+                iconHeight: 50,
+                shapeFn: () => new joint.shapes.cjml.swimlaneElement(),
+                attrs: {
+                    icon: user8,
                 }
             }
         },
@@ -324,7 +358,7 @@ export default {
             subsection: "tech",
             svg: {
                 icon: tech5_cloud,
-                height: 170,
+                height: 150,
                 width: 1400,
                 iconHeight: 70,
                 shapeFn: () => new joint.shapes.cjml.swimlaneElement(),
