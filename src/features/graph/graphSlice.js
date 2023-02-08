@@ -19,6 +19,10 @@ const initialState = {
     newDecorator: null,
     visible: false,
     cellResizing: false,
+    startPosition: {
+        x: 0,
+        y: 0,
+    }
 }
 
 export const graphSlice = createSlice({
@@ -103,8 +107,11 @@ export const graphSlice = createSlice({
         removeElement: (state, action) => {
             console.log("remove element")
         },
+        startMoveElement: (state, action) => {
+            state.startPosition = action.payload;
+        }
         
     }
 });
-export const { prepareElement, addElement, decorateElement, removeElement} = graphSlice.actions;
+export const { prepareElement, addElement, decorateElement, removeElement, startMoveElement} = graphSlice.actions;
 export default graphSlice.reducer;

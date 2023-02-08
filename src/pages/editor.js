@@ -3,7 +3,7 @@ import { Container, Row, Col } from "react-bootstrap"
 import * as joint from "jointjs"
 import { useSelector, useDispatch } from "react-redux"
 import { Provider } from "react-redux"
-import { addElement, removeElement, decorateElement, setCellResizing } from "../features/graph/graphSlice"
+import { addElement, removeElement, decorateElement, setCellResizing, startMoveElement } from "../features/graph/graphSlice"
 //import { toggleOffCanvas} from "../features/cjml/cjmlSlice"
 import editorSlice, { elementSelected, toggleEditor, startMovePaper, endMovePaper } from "../features/editor/editorSlice"
 import _ from 'lodash';
@@ -355,7 +355,7 @@ const EditorPage = () => {
       }
     } else {
       var pos = cellView.model.attributes.position;
-      var swimlaneAxis = 120; //use different grid size for swimlanes and touchpoints
+      var swimlaneAxis = 100; //use different grid size for swimlanes and touchpoints
       var swimlineHeight = 150;
       var touchpointHeight = 120;
 
@@ -370,29 +370,21 @@ const EditorPage = () => {
       //check if swimlane
       if (cell.attributes.type === "cjml.swimlaneElement") {
         cell.position(Math.round(pos.x / swimlaneAxis) * swimlaneAxis, Math.round(pos.y / swimlaneAxis) * swimlaneAxis);
-        //var embedded = cell.getEmbeddedCells();
+        var posDelta = cell.get("position") - graph_slice.startPosition;
+        var embedded = cell.getEmbeddedCells();
         //console.log("embeds", embedded);
         //TODO improve hack
-        /*
+        
         for (let i = 0; i < embedded.length; i++) {
           var child = embedded[i];
-          var cellViewsBelow = paper.findViewsFromPoint(child.getBBox().center());;
+          //var cellViewsBelow = paper.findViewsFromPoint(child.getBBox().center());
+          var childX = Math.round(child.get('position').x / xOffset) * xOffset;
+          //if (childX < cell.get('position').x + xOffset) {
+          //  cpos.x = cpos.x + xOffset;
+          //}
+          child.position(childX,cell.get('position').y + yOffset);
 
-          if (cellViewsBelow.length && _.find(cellViewsBelow, function (c) { return c.model.id !== cell.id })) {
-            var cellViewBelow = _.find(cellViewsBelow, function (c) { return c.model.id !== cell.id });
-            var swimlanePos = cellViewBelow.model.get('position');
-            var touchpointPos = { x: Math.round(pos.x / swimlaneAxis) * swimlaneAxis, y: swimlanePos.y + yOffset }
-            if (touchpointPos.x < swimlanePos.x + xOffset) {
-              touchpointPos.x = touchpointPos.x + swimlaneAxis;
-            }
-
-            //reserve space to the left for actor icon
-
-            child.position(touchpointPos.x, touchpointPos.y);
-            console.log("pos", touchpointPos)
-          }
         }
-        */
       } //else check if touchpoint
       else if (cell.attributes.type === "cjml.commElement" || cell.attributes.type === "cjml.actionElement") {
         //cell.position(Math.round(pos.x / swimlaneAxis) * swimlaneAxis, Math.round(pos.y / (touchpointAxis + 100)) * (touchpointAxis + 100));
@@ -403,7 +395,7 @@ const EditorPage = () => {
           var swimlanePos = cellViewBelow.model.get('position');
           var touchpointPos = { x: Math.round(pos.x / swimlaneAxis) * swimlaneAxis, y: swimlanePos.y + yOffset }
           if (touchpointPos.x < swimlanePos.x + xOffset) {
-            touchpointPos.x = touchpointPos.x + swimlaneAxis;
+            touchpointPos.x = touchpointPos.x + xOffset;
           }
 
           //reserve space to the left for actor icon
@@ -465,7 +457,10 @@ const EditorPage = () => {
 
     if (!cell.get('embeds') || cell.get('embeds').length === 0) {
       cell.toFront();
+    } else {
+      dispatch(startMoveElement(cell.get('position')));
     }
+
 
     if (cell.get('parent')) {
       console.log(paper.model)
