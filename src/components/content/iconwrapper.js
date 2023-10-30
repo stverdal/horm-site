@@ -22,6 +22,7 @@ const IconWrapper = ({section, item }) => {
     }
     
     const handleClick = () => {
+        console.log("CLICKED");
         if (editor_slice.visible) {
             dispatch(changeIcon({ section: section, id: item["id"] }))
         }
@@ -33,7 +34,9 @@ const IconWrapper = ({section, item }) => {
         onClick={handleClick}
         onDragStart={handlePrepareElement}
         >
-            <img src={item.svg.icon}></img>
+            <img 
+                src={item.svg.icon}>
+            </img>
         </div>
     )
 }

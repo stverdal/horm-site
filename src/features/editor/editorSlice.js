@@ -1,7 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import * as joint from "jointjs"
 import iconInfo from "../../components/content/iconinfo"
-import { staff_tech1 } from "../../svg/symbols/actors/CJMLSymbolsBase64";
 
 const initialState = {
     visible: false,
@@ -19,7 +17,8 @@ const initialState = {
     pointerCoordinates: {
         x: 0,
         y: 0
-    }
+    },
+    modCounter: 0,
 
 }
 
@@ -62,23 +61,44 @@ export const editorSlice = createSlice({
             state.selectedElement.remove();
             state.selectedElement = null;
             state.visible = false;
+            state.modCounter += 1;
         },
         changeElementLabel: (state, action) => {
             console.log("Payload.s",action.payload)
             state.selectedElement.attr('text/text', action.payload);
+            state.modCounter += 1;
+        },
+        changeFontSize: (state, action) => {
+            console.log("Payload.s",action.payload)
+            state.selectedElement.attr('text/font-size', action.payload);
+            state.modCounter += 1;
         },
         changeIcon: (state, action) => {
-            var { section, id } = action.payload;
-            var item = iconInfo[section][id];
-            var svg = item["svg"];
-            if (section == "communication" || section === "action" || section === "actors") {
-                state.selectedElement.attr("icon/href", svg.icon);
-            } else if (section == "supplemental") {
-                state.selectedElement.attr("decorator/href", svg.icon)
+            const { section, id } = action.payload;
+            const item = iconInfo[section][id];
+            const svg = item["svg"];
+            let selectedElement = state.selectedElement;
+
+            if (section === "communication" || section === "action" || section === "actors") {
+                console.log("hello", svg.icon);
+                selectedElement.attr("icon/href", svg.icon);
+            } else if (section === "supplemental") {
+                //if (item["id"] === selectedElement.prop("decorator/id")) {
+                if (svg.icon === selectedElement.attr("decorator/href")) {
+                    console.log("SAME DECORATIR")
+                    //selectedElement.removeAttr("decorator/href");
+                    //selectedElement.removeAttr("decorator/id");
+                    selectedElement.removeAttr("decorator/href")
+                } else {
+                    console.log("DIFFERENT DECORATOR")
+                    //selectedElement = selectedElement.clone().attr("decorator/href", svg.icon).prop("decorator/id", item["id"]);
+                    selectedElement.attr("decorator/href", svg.icon)
+                }
             }
+            state.modCounter += 1;
         }
     }
 });
 
-export const { toggleEditor, startMovePaper, endMovePaper, elementSelected, closeElementEditor, changeElementLabel, deleteElement, changeIcon } = editorSlice.actions;
+export const { toggleEditor, startMovePaper, endMovePaper, elementSelected, closeElementEditor, changeElementLabel, deleteElement, changeIcon, changeFontSize } = editorSlice.actions;
 export default editorSlice.reducer;

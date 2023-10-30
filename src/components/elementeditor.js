@@ -1,11 +1,12 @@
 import React, { useEffect, useRef, useState } from "react"
 import { Container, Row, Col, Accordion, ButtonGroup, Button, InputGroup, FormControl } from "react-bootstrap"
+import Form from "react-bootstrap/Form"
 import { useSelector, useDispatch } from "react-redux"
 import { addElement, removeElement, decorateElement } from "../features/graph/graphSlice"
 import _ from 'lodash';
 import Draggable from 'react-draggable';
 import { breakText } from "jointjs/src/util"
-import { elementSelected, changeElementLabel, closeElementEditor, deleteElement } from "../features/editor/editorSlice"
+import { elementSelected, changeElementLabel, closeElementEditor, deleteElement, changeFontSize } from "../features/editor/editorSlice"
 
 import IconSection from "./content/iconsection";
 
@@ -15,12 +16,13 @@ import "../styles/content/elementeditor.css"
 const ElementEditor = () => {
     const dispatch = useDispatch();
     const editor_slice = useSelector((state) => state.editor);
-    console.log("ELEMENTTUPEDUDE", editor_slice.selectedElement);
+    //console.log("ELEMENTTUPEDUDE", editor_slice.selectedElement);
 
     const [iconType, setIconType] = useState("communication")
 
     const [position, setPosition] = useState(editor_slice.position);
-    const [label, setLabel] = useState(editor_slice.selectedElement.attr('text/text'));
+    const [label, setLabel] = useState(editor_slice.selectedElement.attr('text/text') || "");
+    const [fontSize, setFontSize] = useState(editor_slice.selectedElement.attr('text/fontSize') || 14);
 
     const [input, setInput] = useState("")
 
@@ -32,14 +34,19 @@ const ElementEditor = () => {
             default:
                 break;
         }
+        //set text to match the label at start.
+        setInput(label.replace(/\n|\r/g, ' ').replace(/\s+/g, ' ').trim());
+        //setInput(label)
+        console.log("Editorslice", editor_slice)
+        
       }, [])
 
 
-    console.log("Editorslice", editor_slice)
+    //console.log("Editorslice", editor_slice)
 
     const onDragEnd = (e) => {
         e.preventDefault();
-        console.log("ONDRAGEND E", e)
+        //console.log("ONDRAGEND E", e)
         var offsetTop = document.getElementById("editor-wrapper").offsetTop;
         var offsetLeft = document.getElementById("editor-wrapper").offsetLeft;
         //Account for mouses position relative to elementeditor
@@ -48,19 +55,26 @@ const ElementEditor = () => {
 
     const onLabelChange = (e) => {
         //Use textbreak here.
-        var wraptext =  breakText(input, {width: 100})
+        var wraptext =  breakText(input, {width: 100}, {'fon-size': fontSize})
         dispatch(changeElementLabel(wraptext));
         //setState({ label: e.target.value });
         setLabel(wraptext);
         setInput("");
     }
 
+    const onFontSizeChange = (e) => {
+        dispatch(changeFontSize(fontSize));
+        var wraptext =  breakText(input, {width: 110}, {'font-size': fontSize})
+        dispatch(changeElementLabel(wraptext));
+
+    }
+
     const handleSubmit = () => {
-        var wraptext =  breakText(input, {width: 100})
+        var wraptext =  breakText(input, {width: 110}, {'font-size': fontSize})
         dispatch(changeElementLabel(wraptext));
         //setState({ label: e.target.value });
         setLabel(wraptext);
-        setInput("");
+        //setInput("");
     }
 
     const onDelete = (e) => {
@@ -73,7 +87,11 @@ const ElementEditor = () => {
     
     const onKeyUp = (e) => {
         if (e.charCode === 13) {
-            handleSubmit();
+            if (e.target.id === "input-form") {
+                handleSubmit();
+            } else {
+                onFontSizeChange();
+            }
         }
     }
     return (
@@ -90,28 +108,39 @@ const ElementEditor = () => {
                 <Row className="element-editor-section">
                     <InputGroup className="mb-3 input-group">
                         <FormControl
+                            id="input-form"
                             placeholder="Label"
                             aria-label="Label"
                             aria-describedby="basic-addon2"
                             value={input}
                             onChange={e => setInput(e.target.value)}
                             onKeyPress={onKeyUp}
+                            as="textarea"
                         />
-                        <Button
-                            variant="outline-secondary"
-                            id="button-addon2"
-                            onClick={handleSubmit}
-                        >
-                            Set
-                        </Button>
+                    </InputGroup>
+                </Row>
+                <Row className="element-editor-section">
+                    <p>Fontsize</p>
+                    <InputGroup className="mb-3 input-group">
+                        <FormControl
+                            id="fontsize-form"
+                            placeholder="Font size"
+                            aria-label="Font size"
+                            aria-describedby="basic-addon2"
+                            value={fontSize}
+                            onChange={e => setFontSize(e.target.value)}
+                            onKeyPress={onKeyUp}
+                            type="number"
+                            min="1"
+                            max="100"
+                        />
                     </InputGroup>
                 </Row>
                 {(editor_slice.selectedElement.attributes.type !== "cjml.actionElement") ?
                 <Row className="element-editor-section">
-                    <p>Change icon</p>
                     <Accordion>
                         <Accordion.Item eventKey="0">
-                            <Accordion.Header>Select Icon</Accordion.Header>
+                            <Accordion.Header>Icon</Accordion.Header>
                             <Accordion.Body>
                                 <IconSection section={editor_slice.selectedElement.attributes.attrs.info.section} subsection={editor_slice.selectedElement.attributes.attrs.info.subsection}/>
                             </Accordion.Body>
@@ -120,10 +149,9 @@ const ElementEditor = () => {
                 </Row> : null}
                 {(editor_slice.selectedElement.attributes.type !== "cjml.swimlaneElement") ?
                 <Row className="element-editor-section">
-                    <p>Add cybersecurity tag</p>
                     <Accordion>
                         <Accordion.Item eventKey="0">
-                            <Accordion.Header>Select Icon</Accordion.Header>
+                            <Accordion.Header>Security tag</Accordion.Header>
                             <Accordion.Body>
                             <IconSection section={"supplemental"}/>
                             </Accordion.Body>

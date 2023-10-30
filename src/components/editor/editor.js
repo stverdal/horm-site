@@ -19,7 +19,6 @@ function Editor2(props) {
     console.log("GRAPHHH", graph)
 
     useEffect(() => {
-        console.log("IM DISPAAAATCHIING!")
         dispatch(initGraph())
         console.log("AFTER INIT", graph)
     }, [])

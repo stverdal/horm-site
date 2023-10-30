@@ -135,10 +135,10 @@ function cjmlShapes(joint) {
                 refY: "35%"
             },
             text: {
-                refX: "40%",
-                refY: "20%",
-                textVerticalAnchor: "top",
-                textAnchor: "left",
+                refX: "30%",
+                refY: "15%",
+                textVerticalAnchor: "center",
+                textAnchor: "center",
             },
             decorator: {
                 refHeight: "30%",
@@ -192,10 +192,10 @@ function cjmlShapes(joint) {
                 fill: "#FFF"
             },
             text: {
-                refX: "20%",
-                refY: "20%",
-                textVerticalAnchor: "top",
-                textAnchor: "left",
+                refX: "10%",
+                refY: "15%",
+                textVerticalAnchor: "center",
+                textAnchor: "center",
             },
             decorator: {
                 refHeight: "30%",

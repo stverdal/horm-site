@@ -135,6 +135,7 @@ import {
     store_1,
     tech1_database,
     tech5_cloud,
+    tech3_server,
     service_provider_1,
     staff_IT1,
     user3
@@ -165,7 +166,8 @@ import {
     special_unwanted_incident,
     special_vulnerability_lock,
     special_vulnerability_unlock,
-    asset_symbol
+    asset_symbol,
+    remove
 } from "../../svg/symbols/cybersecurity/CJMLSymbolsBase64.js"
 
 export default {
@@ -174,6 +176,7 @@ export default {
             icon: <Comm_UnknownChannel/>,
             id: "action",
             description: "An action",
+            type: "action",
             svg: {
                 icon: unknown_channel,
                 height: 120,
@@ -197,6 +200,7 @@ export default {
             id: "user_1",
             description: "A user",
             subsection: "user",
+            type: "swimlane",
             svg: {
                 icon: user1,
                 height: 150,
@@ -213,6 +217,7 @@ export default {
             id: "user_2",
             description: "A user",
             subsection: "user",
+            type: "swimlane",
             svg: {
                 icon: user2,
                 height: 150,
@@ -229,6 +234,7 @@ export default {
             id: "user_8",
             description: "A user",
             subsection: "user",
+            type: "swimlane",
             svg: {
                 icon: user8,
                 height: 150,
@@ -245,6 +251,7 @@ export default {
             id: "employee_1",
             description: "An employee",
             subsection: "professional",
+            type: "swimlane",
             svg: {
                 icon: employee1,
                 height: 150,
@@ -259,6 +266,7 @@ export default {
             id: "bank_3",
             description: "A bank",
             subsection: "service-provider",
+            type: "swimlane",
             svg: {
                 icon: bank3,
                 height: 150,
@@ -273,6 +281,7 @@ export default {
             id: "service_provider_1",
             description: "A service provider",
             subsection: "service-provider",
+            type: "swimlane",
             svg: {
                 icon: service_provider_1,
                 height: 150,
@@ -287,6 +296,7 @@ export default {
             id: "doctor_1",
             description: "A doctor",
             subsection: "professional",
+            type: "swimlane",
             svg: {
                 icon: doctor_1,
                 height: 150,
@@ -301,6 +311,7 @@ export default {
             id: "staff_it_1",
             description: "IT staff",
             subsection: "professional",
+            type: "swimlane",
             svg: {
                 icon: staff_IT1,
                 height: 150,
@@ -315,6 +326,7 @@ export default {
             id: "staff_tech_1",
             description: "Technological staff",
             subsection: "professional",
+            type: "swimlane",
             svg: {
                 icon: staff_tech1,
                 height: 150,
@@ -329,6 +341,7 @@ export default {
             id: "store_1",
             description: "A store",
             subsection: "service-provider",
+            type: "swimlane",
             svg: {
                 icon: store_1,
                 height: 150,
@@ -342,8 +355,24 @@ export default {
             id: "tech_1_database",
             description: "A database",
             subsection: "tech",
+            type: "swimlane",
             svg: {
                 icon: tech1_database,
+                height: 150,
+                width: 1400,
+                iconHeight: 70,
+                shapeFn: () => new joint.shapes.cjml.swimlaneElement(),
+                attrs: {}
+            }
+        },
+        tech_3_server: {
+            icon: <Actors_Tech3_Server/>,
+            id: "tech_3_server",
+            description: "A server",
+            subsection: "tech",
+            type: "swimlane",
+            svg: {
+                icon: tech3_server,
                 height: 150,
                 width: 1400,
                 iconHeight: 70,
@@ -356,6 +385,7 @@ export default {
             id: "tech_5_cloud",
             description: "A data cloud",
             subsection: "tech",
+            type: "swimlane",
             svg: {
                 icon: tech5_cloud,
                 height: 150,
@@ -373,6 +403,7 @@ export default {
             icon: <Comm_Chat/>,
             id: "chat",
             description: "A chat",
+            type: "communication",
             svg: {
                 icon: chat,
                 height: 120,
@@ -389,6 +420,7 @@ export default {
             icon: <Comm_Email1/>,
             id: "email_1",
             description: "An email",
+            type: "communication",
             svg: {
                 icon: email_1,
                 height: 120,
@@ -404,6 +436,7 @@ export default {
             icon: <Comm_Internet_Globe/>,
             id: "internet_globe",
             description: "An internet connection",
+            type: "communication",
             svg: {
                 icon: internet_globe,
                 height: 120,
@@ -419,6 +452,7 @@ export default {
             icon: <Comm_Invoice1/>,
             id: "invoice_1",
             description: "An invoice",
+            type: "communication",
             svg: {
                 icon: invoice_1,
                 height: 120,
@@ -434,6 +468,7 @@ export default {
             icon: <Comm_Letter1/>,
             id: "letter_1",
             description: "A letter",
+            type: "communication",
             svg: {
                 icon: letter_1,
                 height: 120,
@@ -449,6 +484,7 @@ export default {
             icon: <Comm_Payment1/>,
             id: "payment_1",
             description: "A payment",
+            type: "communication",
             svg: {
                 icon: payment_1,
                 height: 120,
@@ -464,6 +500,7 @@ export default {
             icon: <Comm_Telephone1/>,
             id: "telephone_1",
             description: "A telephone conversation",
+            type: "communication",
             svg: {
                 icon: telephone_1,
                 height: 120,
@@ -477,25 +514,11 @@ export default {
         },
     },
     supplemental: {
-        attacker: {
-            icon: <Cybersecurity_Attacker/>,
-            id: "attacker",
-            description: "An attacker",
-            svg: {
-                icon: special_threat,
-                height: 80,
-                width: 80,
-                iconHeight: 50,
-                shapeFn: () => new joint.shapes.cjml.unboxedElement(),
-                attrs: {
-                    fill: "#FFF",
-                }
-            }
-        },
         threat: {
             icon: <Cybersecurity_Attacker/>,
             id: "threat",
             description: "A threat",
+            type: "unboxed",
             svg: {
                 icon: special_threat,
                 height: 80,
@@ -511,6 +534,7 @@ export default {
             icon: <Cybersecurity_Attacker/>,
             id: "unwanted_incident",
             description: "An unwanted incident",
+            type: "unboxed",
             svg: {
                 icon: special_unwanted_incident,
                 height: 80,
@@ -522,50 +546,5 @@ export default {
                 }
             }
         },
-        vulnerability_lock: {
-            icon: <Cybersecurity_Attacker/>,
-            id: "vulnerability_lock",
-            description: "A locked vulnerability",
-            svg: {
-                icon: special_vulnerability_lock,
-                height: 80,
-                width: 80,
-                iconHeight: 50,
-                shapeFn: () => new joint.shapes.cjml.unboxedElement(),
-                attrs: {
-                    fill: "#FFF",
-                }
-            }
-        },
-        vulnerability_unlock: {
-            icon: <Cybersecurity_Attacker/>,
-            id: "vulnerability_unlock",
-            description: "An attacker",
-            svg: {
-                icon: special_vulnerability_unlock,
-                height: 80,
-                width: 80,
-                iconHeight: 50,
-                shapeFn: () => new joint.shapes.cjml.unboxedElement(),
-                attrs: {
-                    fill: "#FFF",
-                }
-            }
-        },
-        asset: {
-            icon: <Cybersecurity_Attacker/>,
-            id: "asset",
-            description: "An asset",
-            svg: {
-                icon: asset_symbol,
-                height: 80,
-                width: 80,
-                iconHeight: 50,
-                shapeFn: () => new joint.shapes.cjml.unboxedElement(),
-                attrs: {
-                    fill: "#FFF"
-                }
-            }
-        }
     }
 };

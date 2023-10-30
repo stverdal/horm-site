@@ -9,6 +9,7 @@ import editorSlice, { elementSelected, toggleEditor, startMovePaper, endMovePape
 import _ from 'lodash';
 import Button from 'react-bootstrap/Button';
 
+
 import PageLayout from "../components/layout"
 import Sidebar from "../components/sidebar"
 //import FileLoader from "../components/fileloader"
@@ -16,6 +17,8 @@ import iconInfo from "../components/content/iconinfo"
 import ElementEditor from "../components/elementeditor"
 //import OffCanvas from "../components/offCanvas"
 import SaveBar from "../components/content/saveBar"
+import ClearBar from "../components/content/clearbar"
+import SpyderBar from "../components/content/spyderbar"
 
 
 //import Editor from "../components/editor/editor"
@@ -24,7 +27,7 @@ import "../styles/global.css"
 import "../styles/pages/editor.css"
 import cjmlShapes from "../components/content/cjmlshapes"
 import { parsePath, StaticQueryDocument } from "gatsby"
-
+import { deserializeFunctions } from "../components/utils/utils"
 
 const EditorPage = () => {
 
@@ -72,7 +75,15 @@ const EditorPage = () => {
         gridSize: 1,
         interactive: true,
         cellViewNamespace: joint.shapes,
-        defaultLink: new joint.shapes.standard.Link(),
+        //defaultLink: new joint.shapes.standard.Link(),
+        defaultLink: new joint.shapes.standard.Link({
+          attrs: {
+              line: {
+                strokeWidth: 2,
+                strokeDasharray: "10 5"
+              }
+          }
+        }),
       });
 
       newPaper.setGrid({
@@ -91,6 +102,10 @@ const EditorPage = () => {
 
 
     if (paper !== null) {
+      if (localStorage.getItem("cjml") !== null) {
+        var graph = JSON.parse(localStorage.getItem("cjml"));
+        paper.model.fromJSON(graph);
+      }
       initGraph(paper.model);
       //paper.on('blank:pointerup', blankPointerUp);
       //paper.on('cell:contextmenu', (elementView, e, x, y) => this.props.elementDoubleClicked(elementView.model, e));
@@ -126,6 +141,24 @@ const EditorPage = () => {
     };
 
   }, [paper, flag]);
+
+  useEffect(() => {
+    console.log("saved");
+    saveToLocalStorage();
+  }, [graph_slice.graph, editor_slice.modCounter, graph_slice.modCounter]);
+
+  /*
+  useEffect(() => {
+    //updates the graph when the graph slice is updated
+    if (paper !== null) {
+      console.log("Graph slice updated");
+      //fromJSON(JSON.parse(e.target.result):
+      paper.model.fromJSON(JSON.parse(graph_slice.graph));
+    }
+  }, [graph_slice.graph]);
+
+  */
+
 
   const saveGraphToFile = (fileName) => {
     const a = document.createElement('a');
@@ -164,6 +197,8 @@ const EditorPage = () => {
     //add toolview to the linkview that is attached to link
     linkView.addTools(customToolsView);
     linkView.hideTools();
+    //hack
+    saveToLocalStorage();
   }
 
   const handleBlankContext = (e) => {
@@ -180,6 +215,14 @@ const EditorPage = () => {
     dispatch(elementSelected({ targetElement: elementView.model, event: e, x: x, y: y }));
   }
 
+  /**
+   * Handles the zooming in and out of the paper when the mouse wheel is scrolled.
+   * @param {Object} cellView - The cell view object.
+   * @param {Object} e - The event object.
+   * @param {number} x - The x-coordinate of the mouse pointer.
+   * @param {number} y - The y-coordinate of the mouse pointer.
+   * @param {number} delta - The amount of delta from the mouse wheel scroll.
+   */
   const handleScroll = (cellView, e, x, y, delta) => {
     e.preventDefault();
     const scaleFactor = 1.03;
@@ -200,23 +243,24 @@ const EditorPage = () => {
     handleScroll(null, e, x, y, delta);
   }
 
-  //
 
-  const saveToLocalStorage = () => {
-    console.log("saving")
+  
+  const saveToLocalStorage = (graph=null) => {
     // might want to update redux state here, or update store more frequently
     //console.log(this.props.currGraph.label)
-    window.localStorage.setItem("cjml", JSON.stringify(paper.model.toJSON()));
-    //console.log(this.props.currGraph.label);
-    //window.localStorage.setItem('currTab', this.props.currGraph.label);
+    if (graph !== null) {
+      localStorage.setItem("cjml", JSON.stringify(graph));
+    }
+    else if (paper !== null) {
+      localStorage.setItem("cjml", JSON.stringify(paper.model.toJSON()));
+    }
   }
 
   const getFromLocalStorage = () => {
     if (window.localStorage.getItem("cjml") !== null) {
-      paper.model.fromJSON(JSON.parse(window.localStorage.getItem('cjml')));
+      loadNewGraph(JSON.parse(localStorage.getItem('cjml')));
     }
   }
-
 
   const beginMovePaper = (e, x, y) => {
     console.log('HELLO', x, y);
@@ -261,6 +305,13 @@ const EditorPage = () => {
   
     */
 
+    /**
+     * This function is called when the mouse hovers over a cell view in the graph.
+     * If the cell is a swimlane element, it highlights it and shows its size selector.
+     * If the cell is not a swimlane element, it shows its tools.
+     * @param {Object} cellView - The view of the cell being hovered over.
+     * @param {Object} evt - The event that triggered the hover.
+     */
   const onHover = (cellView, evt) => {
     if (cellView.model.attributes.type === "cjml.swimlaneElement") {
       var cell = cellView.model;
@@ -276,6 +327,12 @@ const EditorPage = () => {
 
   }
 
+  /**
+   * This function is called when the mouse exits a cell view in the graph.
+   * If the cell is a swimlane element, it unhighlights it and hides its size selector.
+   * @param {Object} cellView - The view of the cell being exited.
+   * @param {Object} evt - The event that triggered the exit.
+   */
   const exitHover = (cellView, evt) => {
     if (cellView.model.attributes.type === "cjml.swimlaneElement") {
       var cell = cellView.model;
@@ -288,12 +345,28 @@ const EditorPage = () => {
     }
   }
 
+  /**
+   * This function is called when the user begins to resize an element in the graph.
+   * It sets the interactive option of the cell view to false and sets the increaseElementSize flag to true.
+   * @param {Object} cellView - The view of the cell being resized.
+   * @param {Object} e - The event that triggered the resizing.
+   * @param {number} x - The x-coordinate of the resizing position.
+   * @param {number} y - The y-coordinate of the resizing position.
+   */
   const beginElementResize = (cellView, e, x, y) => {
     cellView.options.interactive = false;
     increaseElementSize = true
     //dispatch(setCellResizing(true));
   }
 
+  /**
+   * This function resizes an element in the graph and performs various actions depending on the type of cell being resized.
+   * If the element is being resized, it sets the new width and height and unhighlights it.
+   * @param {Object} cellView - The view of the cell being resized.
+   * @param {Object} e - The event that triggered the resizing.
+   * @param {number} x - The x-coordinate of the resizing position.
+   * @param {number} y - The y-coordinate of the resizing position.
+   */
   const resizeElement = (cellView, e, x, y) => {
     //console.log(graph_slice.cellResizing)
     console.log(increaseElementSize)
@@ -315,8 +388,23 @@ const EditorPage = () => {
     }
   }
 
+  /**
+    * Embeds an element in the graph and adjusts its position based on its type (swimlane, touchpoint, or link).
+    * If the element is a link, it checks if it is valid and removes it if it is not.
+    * If the element is a swimlane, it positions it on the grid and adjusts the position of its embedded cells.
+  /**
+    * This function embeds a cell in the graph and performs various actions depending on the type of cell being embedded.
+    *  If the element is a touchpoint, it positions it on the grid and reserves space for the actor icon.
+    * If the element is being resized, it sets the new width and height and unhighlights it.
+    * If the element is being added to the graph, it checks if there is an element below it and embeds it if there is.
+    * @param {Object} cellView - The view of the cell being embedded.
+    * @param {Object} evt - The event that triggered the embedding.
+    * @param {number} x - The x-coordinate of the embedding position.
+    * @param {number} y - The y-coordinate of the embedding position.
+  */
   const embedElement = (cellView, evt, x, y) => {
     //console.log("checking embeddddd")
+
     var cell = cellView.model;
     console.log("CELL ", cell)
     if (cell.attributes.type === 'standard.Link') {
@@ -360,7 +448,9 @@ const EditorPage = () => {
       var touchpointHeight = 120;
 
       var yOffset = 15;
-      var xOffset = 120;
+      var xOffset = 110;
+
+      var swimlaneBuffer = 20
 
       var touchpointAxis = (swimlineHeight - touchpointHeight) / 2;
       //console.log("touchpointaxis",touchpointAxis)
@@ -393,7 +483,7 @@ const EditorPage = () => {
         if (cellViewsBelow.length && _.find(cellViewsBelow, function (c) { return c.model.id !== cell.id })) {
           var cellViewBelow = _.find(cellViewsBelow, function (c) { return c.model.id !== cell.id });
           var swimlanePos = cellViewBelow.model.get('position');
-          var touchpointPos = { x: Math.round(pos.x / swimlaneAxis) * swimlaneAxis, y: swimlanePos.y + yOffset }
+          var touchpointPos = { x: (Math.round(pos.x / swimlaneAxis) * swimlaneAxis) + swimlaneBuffer, y: swimlanePos.y + yOffset }
           if (touchpointPos.x < swimlanePos.x + xOffset) {
             touchpointPos.x = touchpointPos.x + xOffset;
           }
@@ -414,7 +504,7 @@ const EditorPage = () => {
       return;
     }
 
-    if (graph_slice.preparedElement.element != null && graph_slice.newElement.section == "supplemental") {
+    if (graph_slice.preparedElement.element != null && graph_slice.newElement.section === "supplemental") {
       var cellViewsBelow = paper.findViewsFromPoint(cell.getBBox().center());
 
       console.log(cellViewsBelow);
@@ -442,53 +532,35 @@ const EditorPage = () => {
 
 
 
+  /**
+   * Unembeds a cell from its parent cell in the paper model.
+   * If the cell is a link, it returns without doing anything.
+   * If the cell has no embeds, it brings it to the front.
+   * If the cell has embeds, it starts moving the element.
+   * If the cell has a parent, it unembeds the cell from its parent.
+   * @param {Object} cellView - The view of the cell to be unembedded.
+   */
   const unembedElement = (cellView) => {
     var cell = cellView.model;
-    //paper.setGridSize(1)
-    //if link return, no need to prepare for embedding
-    //if (cell.attributes.type === 'coras.defaultLink') {
-    //    return;
-    //}
-
-    //console.log('unembedElement')
-
-    //if link exit
-    //this.setState({ elementPosition: cell.attributes.position });
-
     if (!cell.get('embeds') || cell.get('embeds').length === 0) {
       cell.toFront();
     } else {
       dispatch(startMoveElement(cell.get('position')));
     }
-
-
     if (cell.get('parent')) {
-      console.log(paper.model)
       paper.model.getCell(cell.get('parent')).unembed(cell);
     }
   }
 
   //Creates new elements by dropping on paper.
+  /**
+   * Handles the mouse up event on the paper.
+   * If the new element is a supplemental element, it finds the element by coordinates and decorates it.
+   * If the new element is not a supplemental element, it adds the element to the graph and embeds it.
+   * @param {Object} e - The mouse up event.
+   */
   const handlePaperMouseUp = (e) => {
     e.preventDefault();
-    //console.log("EVENT", e);
-    //const localPoint = paper.pageToLocalPoint(e.pageX, e.pageY);
-    //console.log("E", e)
-    //Check if new element or decorating existing element
-    //if (graph_slice.newElement.section == "supplemental") {
-    //  var target = e.target;
-    //var parent = target.parentElement;
-    //  console.log("Target", target)
-    //  while (target.getAttribute("data-type") == null) {
-    //    target = target.parentElement;
-    //    console.log("Target", target)
-    //  }
-    //  if (target.getAttribute("data-type") === "cjml.commElement") {
-    //   console.log("IN HERE",target.getAttribute("data-type"));
-    //    console.log("target",target)
-    //   target.attr("body/fill", "#fe988d");
-    //dispatch(decorateElement({ targetElement: target }));
-    //  }
     const localPoint = paper.pageToLocalPoint(e.pageX, e.pageY);
 
     if (graph_slice.newElement.section === "supplemental") {
@@ -504,42 +576,56 @@ const EditorPage = () => {
       }
     } else {
       var target = paper.model.findModelsFromPoint(localPoint);
-      if (target.length == 0 && graph_slice.preparedElement.element.get("type") !== "cjml.swimlaneElement") {
+      var el = iconInfo[graph_slice.preparedElement.section][graph_slice.preparedElement.id];
+      //console.log("EL ",el)
+      console.log("element", el)
+      if (target.length === 0 && el["type"] !== "swimlane") {
         alert("Touchpoints must be placed in a swimlane.")
       } else {
-        dispatch(addElement({ graph: paper.model, x: localPoint.x, y: localPoint.y }));
-        console.log("CHECKING STATE", graph_slice.preparedElement.element)
-        var cellView = paper.findViewByModel(graph_slice.preparedElement.element);
+        var newElement = el["svg"].shapeFn();
+        console.log("newElement", newElement)
+        dispatch(addElement({ graph: paper.model, x: localPoint.x, y: localPoint.y, element: newElement }));
+        //find cell by id
+        //var id = graph_slice.preparedElement.uid;
+        //console.log("slice", graph_slice.preparedElement);
+        //var id = el.get("id");
+        //find element by id
+        //var element = paper.model.getCell(id);
+        //find cellview by element
+        var cellView = paper.findViewByModel(newElement);
+
+
+        console.log("element pre embed",el, "cellviwe", cellView)
         embedElement(cellView);
       }
     }
-
-    //console.log("CHECKING STATE", graph_slice.preparedElement.element)
-    //var cellView = paper.findViewByModel(graph_slice.preparedElement.element);
-    //embedElement(cellView);
-
-    //saveToLocalStorage();
-
-    //this.props.elementDropped(this.paper.model, localPoint.x, localPoint.y);
-    //var cellView = paper.findViewByModel(this.props.newElement);
-    //console.log(cellView);
-    //this.embedElement(cellView);
   };
+
 
   const initGraph = (graph) => {
     console.log("INITGRAPH")
-    graph.attributes.cells.models.map((model) => {
+    
+    /*graph.attributes.cells.models.map((model) => {
+      if (model.attributes.type === 'standard.Link') {
+        attachTools(model);
+      }
+    })
+    */
+    graph.attributes.cells.models.forEach((model) => {
       if (model.attributes.type === 'standard.Link') {
         attachTools(model);
       }
     })
   }
-
+  /**
+   * This function loads a new graph and sets it as the current graph. It also creates a new jointjs paper object with the loaded graph and sets it as the current paper object.
+   * @param {Object} graph - The graph object to be loaded.
+   */
   const loadNewGraph = (graph) => {
-    setCurrGraph(graph); //does nothing?t
+    setCurrGraph(graph);
     setPaper(new joint.dia.Paper({
       el: document.getElementById("editor"),
-      model: graph, // change
+      model: graph,
       width: document.getElementById("editor-wrapper").offsetWidth - 10,
       height: document.getElementById("editor-wrapper").offsetHeight - 10,
       gridSize: 1,
@@ -547,9 +633,23 @@ const EditorPage = () => {
         color: 'rgba(255, 255, 255, 1)',
       },
       interactive: true,
-      defaultLink: new joint.shapes.standard.Link(),
+      defaultLink: new joint.shapes.standard.Link({
+        attrs: {
+          line: {
+            strokeWidth: 2,
+            strokeDasharray: "10 5"
+          }
+        }
+      }),
       cellViewNamespace: joint.shapes,
     }));
+
+    saveToLocalStorage(graph);
+  }
+
+  const clearGraph = () => {
+    localStorage.removeItem("cjml")
+    paper.model.clear();
   }
 
   const handleOffCanvasShow = () => {
@@ -568,6 +668,8 @@ const EditorPage = () => {
           <Col lg={2}>
             <Sidebar graph={currGraph} />
             <SaveBar saveFile={saveGraphToFile} loadFile={loadNewGraph} />
+            <ClearBar clearGraph={clearGraph}/>
+            <SpyderBar loadGraph={loadNewGraph} attachTools={attachTools}/>
           </Col>
           <Col
             className="editor-wrapper"

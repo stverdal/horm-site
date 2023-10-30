@@ -19,3 +19,5 @@ const PageLayout = ({ children }) => {
 }
 
 export default PageLayout
+
+/*<Header className="layout-header" /> */
